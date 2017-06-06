@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="hu-HU"><head id="head">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="hu-HU" />
+    <meta name="language" content="hu-HU" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+		
+    <link rel="shortcut icon" href="images/favicon.png" />
+
+	<script src="scripts/jquery.min.js"></script>	
+	<script src="scripts/angular.min.js"></script>	
+	<script src="scripts/angular-animate.min.js"></script>	
+	<script src="scripts/froccsfm.js"></script>	
+	
+	<title>FröccsFM @ Tilos Udvar Taliándörögd 2017</title>
+	
+	<link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" media="screen" />
+	<link type="text/css" rel="stylesheet" href="css/style.css" media="screen" />
+
+</head>
+<body>
+
+	<div class="container" ng-app="froccsFm" ng-controller="myCtrl">
+	
+		<h1>FröccsFM @ Tilos Udvar Taliándörögd 2017</h1>
+
+		<div id="orders" class="row order animate-repeat table-striped" ng-repeat="order in orders">
+			<div class="col-sm-1"><span>No: {{order.no}}</span></div>
+			<div class="col-sm-1">{{order.wineAmount}} dl</div>
+			<div class="col-sm-1">{{order.sodaAmount}} dl</div>
+		</div>
+			
+	</div>
+
+	<script>
+		initOrderUpdate();
+	</script>
+
+</body>
+</html>

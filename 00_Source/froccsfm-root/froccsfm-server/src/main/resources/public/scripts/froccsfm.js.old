@@ -1,0 +1,46 @@
+/**
+	FröccsFM
+	(C): guci, 2017
+*/
+var app = angular.module("froccsFm", ['ngAnimate', 'ngWebSocket']);
+
+app.factory('myData', function($websocket) 
+{
+    //--- Open a WebSocket connection
+	log.debug("Opening websocket...");
+    var dataStream = $websocket('orderupdate');
+
+    var collection = [];
+
+    dataStream.onMessage(function(message) 
+	{
+    	log.debug("Got message...");
+    	collection.push(JSON.parse(message.data));
+    });
+
+    var methods = 
+    {
+      collection: collection,
+      get: function() 
+      {
+    		log.debug("Getting orders...");
+    		dataStream.send(JSON.stringify({ action: 'get' }));
+      }
+    };
+
+    return methods;
+});
+
+
+app.controller("myCtrl", function($scope, "myData") 
+{
+//	//--- Load data
+//	$http.get("orders")
+//    .then(function(response) {
+//        $scope.orders = response.data;
+//    });
+  	
+	log.debug("myCtrl started...");
+	$scope.orders = myData.collection;
+	alert($scope.orders);
+});
