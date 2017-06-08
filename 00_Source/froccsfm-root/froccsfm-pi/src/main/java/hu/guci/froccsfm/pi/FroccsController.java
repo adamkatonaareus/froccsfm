@@ -23,6 +23,7 @@ import de.pi3g.pi.oled.OLEDDisplay;
 import de.pi3g.pi.oled.OLEDDisplayImpl;
 import hu.areus.terminus.base.BaseClass;
 import hu.areus.terminus.helpers.FormatHelper;
+import hu.guci.froccsfm.api.Names;
 import hu.guci.froccsfm.api.Order;
 import hu.guci.froccsfm.api.Response;
 import hu.guci.froccsfm.api.Tokens;
@@ -47,6 +48,8 @@ public class FroccsController extends BaseClass
 	
 	private boolean isEmulated;
 	private boolean isActive;
+	private boolean isOrdering;
+	
 	private GpioController gpio;
 	private GpioPinDigitalInput button;
 	private GpioProvider analogProvider;
@@ -69,6 +72,7 @@ public class FroccsController extends BaseClass
 			if (!GraphicsEnvironment.isHeadless())
 			{
 				form = new ControlForm(this);
+				form.show();
 			}
 			
 			initDisplay();
@@ -93,10 +97,10 @@ public class FroccsController extends BaseClass
 	{
 		try
 		{
-			display = isEmulated ? new EmulatedOledDisplay() : new OLEDDisplayImpl();
-			writeLine(0, "FROCCSFM");
-			writeLine(1, "TILOS");
-			writeLine(2, "UDVAR");
+			display = isEmulated ? new EmulatedOledDisplay(form) : new OLEDDisplayImpl();
+			writeLine(0, "FROCCSFM", true);
+			writeLine(1, "TILOS", false);
+			writeLine(2, "UDVAR", false);
 			display.update();
 			Thread.sleep(5000);
 		}
@@ -158,27 +162,6 @@ public class FroccsController extends BaseClass
 	}
 	
 	/**
-	 * Write a message to the display.
-	 * @param message
-	 */
-	private void writeLine(int line, String message)
-	{
-		try
-		{
-			display.drawStringCentered(message, Font.FONT_5X8, 10 * line, true);
-			
-			if (form != null)
-			{
-				form.writeMessage(line, message);
-			}
-		}
-		catch (Exception ex)
-		{
-			getLogger().error("Error while writing to display: " + ex.getMessage(), ex);
-		}
-	}
-	
-	/**
 	 * Update amount display.
 	 */
 	public void updateDisplay()
@@ -187,9 +170,9 @@ public class FroccsController extends BaseClass
 		{
 			if (display != null)
 			{
-				display.clear();
-				writeLine(0, "BOR: " + FormatHelper.formatDecimalToUI(wineAmount, 1, false) + " DL");
-				writeLine(1, "SZODA: " + FormatHelper.formatDecimalToUI(sodaAmount, 1, false) + " DL");
+				writeLine(0, "BOR: " + FormatHelper.formatDecimalToUI(wineAmount, 1, false) + " DL", true);
+				writeLine(1, "SZODA: " + FormatHelper.formatDecimalToUI(sodaAmount, 1, false) + " DL", false);
+				writeLine(2, Names.getNameForDisplay(wineAmount, sodaAmount), false);
 				display.update();
 			}
 		}
@@ -199,6 +182,28 @@ public class FroccsController extends BaseClass
 		}
 	}
 
+	
+	/**
+	 * Write a message to the display.
+	 * @param message
+	 */
+	private void writeLine(int line, String message, boolean clear)
+	{
+		try
+		{
+			if (clear)
+			{
+				display.clear();
+			}
+			
+			display.drawStringCentered(message, Font.FONT_5X8, OLEDDisplay.LINE_HEIGHT * line + OLEDDisplay.MARGIN_TOP, true);
+		}
+		catch (Exception ex)
+		{
+			getLogger().error("Error while writing to display: " + ex.getMessage(), ex);
+		}
+	}
+	
 	/**
 	 * Return the gain amplifier on the given pin.
 	 * @param pin
@@ -239,21 +244,38 @@ public class FroccsController extends BaseClass
 
 	/**
 	 * Do the order.
+	 * @throws IOException 
 	 */
-	public void buttonPushed() 
+	public void buttonPushed() throws IOException 
 	{
 		try
 		{
+			if (isOrdering)
+			{
+				return;
+			}
+			
+			isOrdering = true;
+			
+			writeLine(2, "TURELEM...", true);
+			display.update();	
+			Thread.sleep(1);
+			
 			int no = order(); 
 			
-			display.clear();
-			writeLine(2, "Sorszámod: " + no);
+			writeLine(2, "SORSZAMOD: " + no, true);
 			display.update();
 			Thread.sleep(5000);
 		}
 		catch (Exception ex)
 		{
 			getLogger().error("Error while handling button push: " + ex.getMessage(), ex);
+			writeLine(2, "ALULDETERMINALT.", true);
+			display.update();			
+		}
+		finally
+		{
+			isOrdering = false;
 		}
 	}
 	
@@ -300,11 +322,6 @@ public class FroccsController extends BaseClass
 	 */
 	public void showDialog()
 	{
-		if (form != null)
-		{
-			 form.show();
-		}
-		
 		 isActive = true;
 		 
 		 while (isActive)

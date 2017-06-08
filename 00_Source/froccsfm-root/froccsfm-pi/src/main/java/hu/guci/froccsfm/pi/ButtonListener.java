@@ -27,10 +27,17 @@ public class ButtonListener extends BaseListener implements GpioPinListenerDigit
     @Override
     public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) 
     {
-        // display pin state on console
-        getLogger().debug(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-        
-        //--- Call controller
-        getParent().buttonPushed();
+    	try
+    	{
+	        // display pin state on console
+	        getLogger().debug(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
+	        
+	        //--- Call controller
+	        getParent().buttonPushed();
+    	}
+    	catch (Exception ex)
+    	{
+    		getLogger().error("Error in button push event: " + ex.getMessage(), ex);
+    	}
     }
 }

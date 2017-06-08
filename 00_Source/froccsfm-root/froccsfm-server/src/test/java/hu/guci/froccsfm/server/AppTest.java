@@ -21,7 +21,7 @@ public class AppTest extends BaseTestClass
 	@Test
 	public void testApp() throws ClassNotFoundException, IOException, URISyntaxException
 	{
-		testClassLoading("javax/servlet/Filter");
+		//testClassLoading("javax/servlet/Filter");
 		App.main(null);
 	}
 }

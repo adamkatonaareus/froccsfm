@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hu.areus.terminus.base.BaseClass;
+import hu.guci.froccsfm.api.Names;
 import hu.guci.froccsfm.api.Order;
 
 /**
@@ -115,6 +116,7 @@ public class OrderDao extends BaseClass
 				order.setCreated(rs.getString("created"));
 				order.setNo(rs.getInt("no"));
 				order.setFulfilled(rs.getInt("fulfilled") == 1);
+				order.setName(Names.getName(order.getWineAmount(), order.getSodaAmount()));
 				result.add(order);
 			}
 

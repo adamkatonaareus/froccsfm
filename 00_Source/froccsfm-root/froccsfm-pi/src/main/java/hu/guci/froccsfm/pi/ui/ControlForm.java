@@ -3,11 +3,12 @@
  */
 package hu.guci.froccsfm.pi.ui;
 
-import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -53,13 +54,8 @@ public final class ControlForm extends BaseClass
 	 public void show()
 	 {
 	 	mainFrame = new JFrame("FröccsFM");
-	 	mainFrame.setSize(400, 400);
-	 	mainFrame.setLayout(new FlowLayout());
-
-	 	//--- Add display
-	 	displayLabel = new JLabel("Display", JLabel.CENTER);
-	 	displayLabel.setSize(400, 100);
-	 	mainFrame.add(displayLabel);
+	 	mainFrame.setSize(300, 200);
+	 	mainFrame.setLayout(new GridLayout(0, 1));
 	 	
 	 	//--- Add controls
 	 	SpinnerModel spinnerModel1 = new SpinnerNumberModel(
@@ -97,9 +93,19 @@ public final class ControlForm extends BaseClass
 	 	okButton.addActionListener(new ActionListener() {
 	         public void actionPerformed(ActionEvent e) 
 	         {
-	            froccsController.buttonPushed();
+	            try 
+	            {
+					froccsController.buttonPushed();
+				} catch (IOException e1) 
+	            {
+					getLogger().error(e1);
+				}
 	         }          
 	      });
+
+	 	//--- Add display
+	 	displayLabel = new JLabel("Display", JLabel.CENTER);
+	 	mainFrame.add(displayLabel);
 	 	
 	 	//-- Show form
 	 	mainFrame.setVisible(true);
@@ -148,12 +154,20 @@ public final class ControlForm extends BaseClass
 
 
 	/**
+	 * Write to display.
 	 * @param message
 	 */
-	public void writeMessage(int line, String message) 
+	public void drawStringCentered(String message, int line) 
 	{
 		lines[line] = message;
-		displayLabel.setText(lines[0] + "\r\n" + lines[1] + "\r\n" + lines[2]);
+	}
+
+	/**
+	 * Update display.
+	 */
+	public void update()
+	{
+		displayLabel.setText(lines[0] + "\r\n " + lines[1] + "\r\n " + lines[2]);
 	}
 
 	/**
@@ -171,5 +185,13 @@ public final class ControlForm extends BaseClass
 			case 1: spinner2.setValue(value);
 			break;
 		}
+	}
+	
+	/**
+	 * Clear the display.
+	 */
+	public void clear()
+	{
+		lines = new String[] {"", "", ""};
 	}
 }

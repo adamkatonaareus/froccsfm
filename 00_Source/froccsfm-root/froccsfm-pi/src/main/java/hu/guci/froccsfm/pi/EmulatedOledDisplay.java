@@ -9,6 +9,7 @@ import java.io.IOException;
 import de.pi3g.pi.oled.Font;
 import de.pi3g.pi.oled.OLEDDisplay;
 import hu.areus.terminus.base.BaseClass;
+import hu.guci.froccsfm.pi.ui.ControlForm;
 
 /**
  * @author adam.katona
@@ -16,14 +17,26 @@ import hu.areus.terminus.base.BaseClass;
  */
 public class EmulatedOledDisplay extends BaseClass implements OLEDDisplay 
 {
-
+	private ControlForm form;
+	
+	/**
+	 * 
+	 */
+	public EmulatedOledDisplay(ControlForm form) 
+	{
+		this.form = form;
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.pi3g.pi.oled.OLEDDisplay#clear()
 	 */
 	@Override
-	public void clear() {
-		// 
-
+	public void clear() 
+	{
+		if (form != null)
+		{
+			form.clear();
+		}
 	}
 
 	/* (non-Javadoc)
@@ -75,9 +88,12 @@ public class EmulatedOledDisplay extends BaseClass implements OLEDDisplay
 	 * @see de.pi3g.pi.oled.OLEDDisplay#drawStringCentered(java.lang.String, de.pi3g.pi.oled.Font, int, boolean)
 	 */
 	@Override
-	public void drawStringCentered(String string, Font font, int y, boolean on) {
-		// 
-
+	public void drawStringCentered(String string, Font font, int y, boolean on) 
+	{
+		if (form != null)
+		{
+			form.drawStringCentered(string, (y - OLEDDisplay.MARGIN_TOP) / OLEDDisplay.LINE_HEIGHT);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -102,9 +118,12 @@ public class EmulatedOledDisplay extends BaseClass implements OLEDDisplay
 	 * @see de.pi3g.pi.oled.OLEDDisplay#update()
 	 */
 	@Override
-	public void update() throws IOException {
-		// 
-
+	public void update() throws IOException 
+	{
+		if (form != null) 
+		{
+			form.update();
+		}
 	}
 
 }

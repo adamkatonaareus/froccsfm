@@ -1,4 +1,51 @@
 
+html
+{
+}
+body
+{
+	background: black url('../images/cat.png') no-repeat -300px 0px;
+	color: #39b5c9;	
+}
+
+h1
+{
+	font-size: 40px;
+	color: #6cff00;
+	padding-bottom: 20px;
+}
+
+.order
+{
+	height: 100px;
+	font-size: 34px;
+	vertical-align: bottom;
+}
+
+.orderNo
+{
+	color: #6cff00;
+	font-size: 12px;
+	text-align: center;
+}
+.orderNo p
+{
+	font-size: 60px;
+	margin: 0px;
+	padding: 0px;
+	line-height: 60px;
+}
+
+.amount
+{
+	padding-top: 10px;
+}
+
+.orderName
+{
+	padding-top: 10px;
+	
+}
 
 /*
 	Animation
@@ -11,8 +58,8 @@
 .animate-repeat.ng-enter,
 .animate-repeat.ng-leave 
 {
-  -webkit-transition: all linear 0.2s;
-  transition: all linear 0.2s;
+  -webkit-transition: all linear 0.5s;
+  transition: all linear 0.5s;
       position: relative;
     display: block;
 }

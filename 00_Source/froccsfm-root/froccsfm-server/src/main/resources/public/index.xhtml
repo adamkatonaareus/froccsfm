@@ -28,10 +28,12 @@
 	
 		<h1>FröccsFM @ Tilos Udvar Taliándörögd 2017</h1>
 
-		<div id="orders" class="row order animate-repeat table-striped" ng-repeat="order in orders">
-			<div class="col-sm-1"><span>No: {{order.no}}</span></div>
-			<div class="col-sm-1">{{order.wineAmount}} dl</div>
-			<div class="col-sm-1">{{order.sodaAmount}} dl</div>
+		<div class="row animate-repeat" ng-repeat="order in orders">
+			<div class="col-xs-2 order orderNo"><p>{{order.no}}</p>{{order.created}}</div>
+			<div class="col-xs-2 order amount">{{order.wineAmount | number:1}} dl</div>
+			<div class="col-xs-2 order amount">{{order.sodaAmount | number:1}} dl</div>
+			<div class="col-xs-6 order orderName">{{order.name}}</div>
+			<div class="clearfix"></div>
 		</div>
 			
 	</div>

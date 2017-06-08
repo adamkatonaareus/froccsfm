@@ -10,8 +10,11 @@ import java.io.IOException;
  * @author adam.katona
  *
  */
-public interface OLEDDisplay {
-
+public interface OLEDDisplay 
+{
+	public static final int LINE_HEIGHT = 10;
+	public static final int MARGIN_TOP = 5;
+	
 	void clear();
 
 	int getWidth();

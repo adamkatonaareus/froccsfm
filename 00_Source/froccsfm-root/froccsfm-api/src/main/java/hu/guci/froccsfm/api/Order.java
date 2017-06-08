@@ -17,6 +17,7 @@ public class Order
 	private String created;
 	private boolean isFulfilled;
 	private String token;
+	private String name;
 	
 	/**
 	 * @return the wineAmount
@@ -101,5 +102,17 @@ public class Order
 	 */
 	public void setToken(String token) {
 		this.token = token;
+	}
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 }

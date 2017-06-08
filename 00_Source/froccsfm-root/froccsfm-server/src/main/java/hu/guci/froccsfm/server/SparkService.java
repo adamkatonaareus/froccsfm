@@ -8,6 +8,7 @@ import java.util.List;
 import com.google.gson.Gson;
 
 import hu.areus.terminus.base.BaseClass;
+import hu.guci.froccsfm.api.Names;
 import hu.guci.froccsfm.api.Order;
 import hu.guci.froccsfm.api.Response;
 import hu.guci.froccsfm.api.Tokens;
@@ -88,6 +89,7 @@ public class SparkService extends BaseClass
 				//--- Broadcast the order
 				data.setNo(no);
 				data.setToken(null);
+				data.setName(Names.getName(data.getWineAmount(), data.getSodaAmount()));
 				wsHandler.broadcast(gson.toJson(data));
 				
 				//--- Return number to client
