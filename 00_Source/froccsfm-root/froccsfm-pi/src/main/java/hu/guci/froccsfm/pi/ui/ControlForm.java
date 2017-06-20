@@ -36,7 +36,7 @@ public final class ControlForm extends BaseClass
 	 private JSpinner spinner2;
 	 private JButton okButton;
 	 private FroccsController froccsController;
-	 private String[] lines = new String[] {"", "", ""};
+	 private String[] lines = new String[] {"", "", "", "", "", "", "", "", "", ""};
 
 	 /**
 	  * Constructor.
@@ -49,9 +49,9 @@ public final class ControlForm extends BaseClass
 	 
 	 
 	 /**
-	  * Show form.
+	  * Init form.
 	  */
-	 public void show()
+	 public void init()
 	 {
 	 	mainFrame = new JFrame("FröccsFM");
 	 	mainFrame.setSize(300, 200);
@@ -106,7 +106,13 @@ public final class ControlForm extends BaseClass
 	 	//--- Add display
 	 	displayLabel = new JLabel("Display", JLabel.CENTER);
 	 	mainFrame.add(displayLabel);
-	 	
+	 }
+	 
+	 /**
+	  * Show form.
+	  */
+	 public void show()
+	 {
 	 	//-- Show form
 	 	mainFrame.setVisible(true);
 	 	mainFrame.addWindowListener(new WindowAdapter() 
@@ -116,7 +122,9 @@ public final class ControlForm extends BaseClass
 	        {
 	           close();
 	        }        
-	 	});    
+	 	});
+	 	
+	 	update();
 	 }
 	 
 	 /**
@@ -167,7 +175,14 @@ public final class ControlForm extends BaseClass
 	 */
 	public void update()
 	{
-		displayLabel.setText(lines[0] + "\r\n " + lines[1] + "\r\n " + lines[2]);
+		StringBuilder sb = new StringBuilder();
+		for(String s : lines)
+		{
+			sb.append(s);
+			sb.append(" ");
+		}
+		
+		displayLabel.setText(sb.toString());
 	}
 
 	/**

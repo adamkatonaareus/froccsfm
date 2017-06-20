@@ -13,7 +13,7 @@ import java.io.IOException;
 public interface OLEDDisplay 
 {
 	public static final int LINE_HEIGHT = 10;
-	public static final int MARGIN_TOP = 5;
+	public static final int MARGIN_TOP = 15;
 	
 	void clear();
 

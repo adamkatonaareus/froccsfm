@@ -2,6 +2,11 @@ package hu.guci.froccsfm.pi;
 
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
+import java.net.URL;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 import com.google.gson.Gson;
 import com.pi4j.gpio.extension.ads.ADS1115GpioProvider;
@@ -17,6 +22,7 @@ import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
+import com.pi4j.system.NetworkInfo;
 
 import de.pi3g.pi.oled.Font;
 import de.pi3g.pi.oled.OLEDDisplay;
@@ -40,15 +46,17 @@ public class FroccsController extends BaseClass
 {
 	public final static double MAX_WINE_AMOUNT = 5; //--- dl
 	public final static double MAX_SODA_AMOUNT = 5; //--- dl
+	public final static double SUM_MAX_AMOUNT = 5; //--- dl
 	public final static double DEFAULT_WINE_AMOUNT = 1; //--- dl
 	public final static double DEFAULT_SODA_AMOUNT = 1; //--- dl
+	public final static double AMOUNT_CORRECTION = 1.25;
 	
 	private double wineAmount = DEFAULT_WINE_AMOUNT;
 	private double sodaAmount = DEFAULT_SODA_AMOUNT;
 	
 	private boolean isEmulated;
 	private boolean isActive;
-	private boolean isOrdering;
+	private State state = State.STARTING;
 	
 	private GpioController gpio;
 	private GpioPinDigitalInput button;
@@ -72,14 +80,18 @@ public class FroccsController extends BaseClass
 			if (!GraphicsEnvironment.isHeadless())
 			{
 				form = new ControlForm(this);
-				form.show();
+				form.init();
 			}
 			
 			initDisplay();
 			initAnalogInput();
 	        initButton();
-	        updateDisplay();
-	
+	        
+	        if (form != null)
+	        {
+	        	form.show();
+	        }
+	        
 			getLogger().info("Controller initialized.");
 		}
 		catch (Exception ex)
@@ -101,8 +113,26 @@ public class FroccsController extends BaseClass
 			writeLine(0, "FROCCSFM", true);
 			writeLine(1, "TILOS", false);
 			writeLine(2, "UDVAR", false);
+			
+			int i=0;
+			while(NetworkInfo.getIPAddresses().length < 1)
+			{
+				//writeLine(3, "NO IP...", false);
+				Thread.sleep(1000);
+				i++;
+				if (i>10)
+				{
+					break;
+				}
+			}
+			
+			i = 3;
+			for (String ipAddress : NetworkInfo.getIPAddresses())
+			{
+				writeLine(i++, ipAddress, false);
+			}
+			
 			display.update();
-			Thread.sleep(5000);
 		}
 		catch (Exception ex)
 		{
@@ -120,9 +150,9 @@ public class FroccsController extends BaseClass
 		analogProvider = isEmulated ? new EmulatedGpioProvider() : new ADS1115GpioProvider(I2CBus.BUS_1, ADS1115GpioProvider.ADS1115_ADDRESS_0x48);
         GpioPinAnalogInput myInputs[] = {
                 gpio.provisionAnalogInputPin(analogProvider, ADS1115Pin.INPUT_A0, "MyAnalogInput-A0"),
-                gpio.provisionAnalogInputPin(analogProvider, ADS1115Pin.INPUT_A1, "MyAnalogInput-A1"),
-                gpio.provisionAnalogInputPin(analogProvider, ADS1115Pin.INPUT_A2, "MyAnalogInput-A2"),
-                gpio.provisionAnalogInputPin(analogProvider, ADS1115Pin.INPUT_A3, "MyAnalogInput-A3"),
+                gpio.provisionAnalogInputPin(analogProvider, ADS1115Pin.INPUT_A1, "MyAnalogInput-A1")
+//                gpio.provisionAnalogInputPin(analogProvider, ADS1115Pin.INPUT_A2, "MyAnalogInput-A2"),
+//                gpio.provisionAnalogInputPin(analogProvider, ADS1115Pin.INPUT_A3, "MyAnalogInput-A3"),
         };
         
         if (isEmulated)
@@ -139,8 +169,8 @@ public class FroccsController extends BaseClass
         AnalogListener listener = new AnalogListener(this);
         myInputs[0].addListener(listener);
         myInputs[1].addListener(listener);
-        myInputs[2].addListener(listener);
-        myInputs[3].addListener(listener);        
+//        myInputs[2].addListener(listener);
+//        myInputs[3].addListener(listener);        
 	}
 	
 	/**
@@ -158,7 +188,16 @@ public class FroccsController extends BaseClass
 	 */
 	public void shutdown()
 	{
-		gpio.shutdown();
+		try
+		{
+			writeLine(2, "NEM MEGY.", true);
+			display.update();
+			gpio.shutdown();
+		}
+		catch (Exception ex)
+		{
+			getLogger().error("Error while shutting down: " + ex.getMessage(), ex);
+		}
 	}
 	
 	/**
@@ -172,7 +211,7 @@ public class FroccsController extends BaseClass
 			{
 				writeLine(0, "BOR: " + FormatHelper.formatDecimalToUI(wineAmount, 1, false) + " DL", true);
 				writeLine(1, "SZODA: " + FormatHelper.formatDecimalToUI(sodaAmount, 1, false) + " DL", false);
-				writeLine(2, Names.getNameForDisplay(wineAmount, sodaAmount), false);
+				writeLine(3, Names.getNameForDisplay(wineAmount, sodaAmount), false);
 				display.update();
 			}
 		}
@@ -224,13 +263,30 @@ public class FroccsController extends BaseClass
 	 */
 	public void valueChanged(int i, double value) 
 	{
+		if (state == State.STARTING)
+		{
+			return;
+		}
+		
 		switch (i)
 		{
 			case 0:
-				wineAmount = MAX_WINE_AMOUNT * value / 100;
+				wineAmount = MAX_WINE_AMOUNT * value / 100 * AMOUNT_CORRECTION;
+				
+				if (wineAmount + sodaAmount > SUM_MAX_AMOUNT)
+				{
+					sodaAmount = SUM_MAX_AMOUNT - wineAmount;
+				}
+				
 				break;
 			case 1:
-				sodaAmount = MAX_SODA_AMOUNT * value / 100;
+				sodaAmount = MAX_SODA_AMOUNT * value / 100 * AMOUNT_CORRECTION;
+				
+				if (wineAmount + sodaAmount > SUM_MAX_AMOUNT)
+				{
+					wineAmount = SUM_MAX_AMOUNT - sodaAmount;
+				}
+				
 				break;
 		}
 		
@@ -250,35 +306,66 @@ public class FroccsController extends BaseClass
 	{
 		try
 		{
-			if (isOrdering)
+			switch (state)
 			{
-				return;
+				case STARTING:
+					state = State.STARTED;
+					updateDisplay();
+					return;
+					
+				case ORDERING:
+				case STOPPED:
+					return;
+					
+				case STARTED:
+					state = State.ORDERING;
+					
+					writeLine(2, "TURELEM...", true);
+					display.update();	
+					beep();
+					
+					int no = order(); 
+					
+					writeLine(2, "SORSZAMOD: " + no, true);
+					display.update();
+					Thread.sleep(5000);					
+					break;
 			}
 			
-			isOrdering = true;
-			
-			writeLine(2, "TURELEM...", true);
-			display.update();	
-			Thread.sleep(1);
-			
-			int no = order(); 
-			
-			writeLine(2, "SORSZAMOD: " + no, true);
-			display.update();
-			Thread.sleep(5000);
+
 		}
 		catch (Exception ex)
 		{
 			getLogger().error("Error while handling button push: " + ex.getMessage(), ex);
-			writeLine(2, "ALULDETERMINALT.", true);
+			writeLine(2, "ALULDETERMINALT", true);
 			display.update();			
 		}
 		finally
 		{
-			isOrdering = false;
+			state = State.STARTED;
 		}
 	}
 	
+	/**
+	 * Do a beep.
+	 */
+	private void beep() 
+	{
+		try
+		{
+			URL url = getClass().getResource("beep.wav");
+			getLogger().debug("URL: " + url);
+			AudioInputStream audioIn = AudioSystem.getAudioInputStream(getClass().getResource("beep.wav"));
+			Clip clip = AudioSystem.getClip();
+			clip.open(audioIn);
+			clip.start();
+		}
+		catch (Exception ex)
+		{
+			getLogger().error("Error while beeping: " + ex.getMessage(), ex);
+		}
+	}
+
 	/**
 	 * Order the froccs.
 	 * @return

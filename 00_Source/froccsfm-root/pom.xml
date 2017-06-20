@@ -152,9 +152,10 @@
 
 		<!-- Resource filtering enables displaying the version no. -->
 		<resources>
+			<!-- FIX KA 20170609: not filtering binary stuff. -->
 			<resource>
 				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
+				<filtering>false</filtering>
 			</resource>
 			<!-- FIX KA 20140516: Removed, this copies all stuff from src/test/resources 
 				<resource> <directory>src/test/resources</directory> <filtering>true</filtering> 
