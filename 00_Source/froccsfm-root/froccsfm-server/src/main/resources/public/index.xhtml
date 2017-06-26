@@ -28,7 +28,8 @@
 	
 		<h1>FröccsFM @ Tilos Udvar Taliándörögd 2017</h1>
 
-		<div class="row animate-repeat" ng-repeat="order in orders">
+		<!-- This div needs to have an id! -->
+		<div id="orders" class="row animate-repeat" ng-repeat="order in orders">
 			<div class="col-xs-2 order orderNo"><p>{{order.no}}</p>{{order.created}}</div>
 			<div class="col-xs-2 order amount">{{order.wineAmount | number:1}} dl</div>
 			<div class="col-xs-2 order amount">{{order.sodaAmount | number:1}} dl</div>

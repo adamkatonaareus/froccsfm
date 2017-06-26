@@ -167,6 +167,12 @@ public final class ControlForm extends BaseClass
 	 */
 	public void drawStringCentered(String message, int line) 
 	{
+		if (line >= lines.length)
+		{
+			getLogger().error("Can't write to display, line no > array length " + line);
+			return;
+		}
+		
 		lines[line] = message;
 	}
 
@@ -207,6 +213,9 @@ public final class ControlForm extends BaseClass
 	 */
 	public void clear()
 	{
-		lines = new String[] {"", "", ""};
+		for(int i=0; i<lines.length; i++)
+		{
+			lines[i] = "";
+		}
 	}
 }

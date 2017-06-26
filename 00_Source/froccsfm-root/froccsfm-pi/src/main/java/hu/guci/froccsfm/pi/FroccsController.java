@@ -114,22 +114,25 @@ public class FroccsController extends BaseClass
 			writeLine(1, "TILOS", false);
 			writeLine(2, "UDVAR", false);
 			
-			int i=0;
-			while(NetworkInfo.getIPAddresses().length < 1)
+			if (!isEmulated)
 			{
-				//writeLine(3, "NO IP...", false);
-				Thread.sleep(1000);
-				i++;
-				if (i>10)
+				int i=0;
+				while(NetworkInfo.getIPAddresses() == null || NetworkInfo.getIPAddresses().length < 1)
 				{
-					break;
+					//writeLine(3, "NO IP...", false);
+					Thread.sleep(1000);
+					i++;
+					if (i>10)
+					{
+						break;
+					}
 				}
-			}
-			
-			i = 3;
-			for (String ipAddress : NetworkInfo.getIPAddresses())
-			{
-				writeLine(i++, ipAddress, false);
+				
+				i = 3;
+				for (String ipAddress : NetworkInfo.getIPAddresses())
+				{
+					writeLine(i++, ipAddress, false);
+				}
 			}
 			
 			display.update();

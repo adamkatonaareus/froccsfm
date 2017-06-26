@@ -43,7 +43,7 @@ public class OrderDao extends BaseClass
 		{
 			Statement statement = connection.createStatement();
 			//statement.execute("DROP TABLE ORDERING");
-			statement.execute("CREATE TABLE ORDERING " +
+			statement.execute("CREATE TABLE if not exists ORDERING " +
 	                "(ID INTEGER PRIMARY KEY," +
 	                " WINEAMOUNT     REAL    NOT NULL, " + 
 	                " SODAAMOUNT     REAL    NOT NULL, " + 

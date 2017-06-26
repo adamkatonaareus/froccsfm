@@ -34,7 +34,7 @@ function initOrderUpdate()
 		
 	ws.onmessage = function (evt) 
 	{ 
-	   result = JSON.parse(evt.data);
+	   var result = JSON.parse(evt.data);
 	   
 	   if (Array.isArray(result))
 	   {
@@ -47,13 +47,11 @@ function initOrderUpdate()
 	   else
 	   {
 		   console.log("New order received: " + evt.data);
-		   var scope = angular.element($("#orders")).scope();
-		   scope.$apply(function(scope)
+		   applyToScope(function(scope)
 		   {
-				scope.orders.unshift(result);
+			   scope.orders.unshift(result);
 		   });
 	   }
-	   
 	};
 		
 	ws.onclose = function()
@@ -74,7 +72,22 @@ function sendOrderUpdate()
 
 function applyToScope(func)
 {
-	var scope = angular.element($("#orders")).scope();
-	scope.$apply(func(scope));
+	var orders = $("#orders");
+	if (!orders)
+	{
+		console.log("Orders div not found!");
+		return;
+	}
+	
+	var scope = angular.element(orders).scope();
+	
+	if (scope)
+	{
+		scope.$apply(func(scope));
+	}
+	else
+	{
+		console.log("Can't find scope.");
+	}
 }
 

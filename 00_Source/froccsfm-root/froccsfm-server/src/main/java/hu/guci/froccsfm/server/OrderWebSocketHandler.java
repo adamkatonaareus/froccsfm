@@ -35,6 +35,9 @@ public class OrderWebSocketHandler extends BaseClass
     {
         getLogger().debug("Client connected to websocket.");
         sessions.add(session);
+        
+        //--- Don't timeout
+        session.setIdleTimeout(-1);
     }
 
     @OnWebSocketClose
