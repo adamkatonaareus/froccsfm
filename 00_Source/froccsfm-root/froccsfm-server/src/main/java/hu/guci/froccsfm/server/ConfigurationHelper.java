@@ -38,4 +38,13 @@ public class ConfigurationHelper extends BaseConfigurationHelper
 	{
 		return getIntConfigurationValue("MaxOrderNo", 99);
 	}
+
+	/**
+	 * Returns true if sign up is enabled.
+	 * @return
+	 */
+	public boolean isSignupEnabled() 
+	{
+		return getBooleanConfigurationValue("SignupEnabled", false);
+	}
 }

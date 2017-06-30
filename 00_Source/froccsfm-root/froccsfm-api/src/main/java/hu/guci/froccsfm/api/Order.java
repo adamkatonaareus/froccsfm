@@ -18,6 +18,8 @@ public class Order
 	private boolean isFulfilled;
 	private String token;
 	private String name;
+	private boolean isVip;
+	private String customerName;
 	
 	/**
 	 * @return the wineAmount
@@ -114,5 +116,29 @@ public class Order
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+	/**
+	 * @return the isVip
+	 */
+	public boolean isVip() {
+		return isVip;
+	}
+	/**
+	 * @param isVip the isVip to set
+	 */
+	public void setVip(boolean isVip) {
+		this.isVip = isVip;
+	}
+	/**
+	 * @return the customerName
+	 */
+	public String getCustomerName() {
+		return customerName;
+	}
+	/**
+	 * @param customerName the customerName to set
+	 */
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
 	}
 }

@@ -1,5 +1,6 @@
 package hu.guci.froccsfm.server;
 
+import java.io.IOException;
 import java.util.Date;
 
 import org.hamcrest.Matchers;
@@ -43,6 +44,30 @@ public class SparkServiceTest extends BaseTestClass
 				post("http://localhost:8090/order").
 		    	then().
 		    	statusCode(200).body("success", Matchers.equalTo(true));		
+		}
+		
+		service.stop();
+	}
+	
+	/**
+	 * Just start the server.
+	 */
+	@Test
+	public void testStartStop()
+	{
+		SparkService service = new SparkService();
+		service.start();
+		
+		try
+		{
+			while (true)
+			{
+				System.in.read();
+			}
+		}
+		catch (IOException ex)
+		{
+			//--- Nothing to do here
 		}
 		
 		service.stop();

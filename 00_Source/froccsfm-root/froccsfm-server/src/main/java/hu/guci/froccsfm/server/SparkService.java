@@ -3,17 +3,22 @@
  */
 package hu.guci.froccsfm.server;
 
+import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.io.IOUtils;
 
 import com.google.gson.Gson;
 
 import hu.areus.terminus.base.BaseClass;
+import hu.areus.terminus.helpers.FormatHelper;
 import hu.guci.froccsfm.api.Names;
 import hu.guci.froccsfm.api.Order;
 import hu.guci.froccsfm.api.Response;
 import hu.guci.froccsfm.api.Tokens;
 import spark.Spark;
 import spark.staticfiles.MimeType;
+import spark.utils.StringUtils;
 
 /**
  * @author adam.katona
@@ -86,6 +91,11 @@ public class SparkService extends BaseClass
 				getLogger().info("Wine: " + data.getWineAmount() + " Soda: " + data.getSodaAmount());
 				int no = dao.storeOrder(data);
 				
+				if (StringUtils.isBlank(data.getCreated()))
+				{
+					data.setCreated(FormatHelper.formatDateTimeToUI(new Date()));
+				}
+				
 				//--- Broadcast the order
 				data.setNo(no);
 				data.setToken(null);
@@ -120,6 +130,43 @@ public class SparkService extends BaseClass
 				return gson.toJson(Response.failure("Sikertelen rendelés."));
 			}			
 		});
+		
+		//--- Define order fulfill call
+		Spark.post("/fulfill", (request, response) -> 
+		{
+			try
+			{
+				int id = Integer.parseInt(request.body());
+				dao.fulFill(id);
+				return "Ok.";
+			}
+			catch (Exception ex)
+			{
+				getLogger().error("Error while fulfilling order: " + ex.getMessage(), ex);
+				return "Sorry.";
+			}
+		});
+		
+		//--- Signup, if enabled.
+		if (ConfigurationHelper.getInstance().isSignupEnabled())
+		{
+			getLogger().warn("Warning! Signup is enabled!");
+			
+			Spark.get("/signup", (request, response) ->
+			{
+				try
+				{
+					response.type("text/html");
+					return IOUtils.toString(this.getClass().getResourceAsStream("/private/signup.xhtml"), "UTF-8");
+				}
+				catch (Exception ex)
+				{
+					getLogger().error("Error while returning Signup page: " + ex.getMessage(), ex);
+					return "Sorry.";
+				}
+			}
+			);
+		}
 		
 		getLogger().debug("Spark started.");
 	}

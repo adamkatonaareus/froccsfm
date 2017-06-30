@@ -13,8 +13,7 @@
 
 	<script src="scripts/jquery.min.js"></script>	
 	<script src="scripts/angular.min.js"></script>	
-	<script src="scripts/angular-animate.min.js"></script>	
-	<script src="scripts/orders.js"></script>	
+	<script src="scripts/signup.js"></script>	
 	
 	<title>FröccsFM @ Tilos Udvar Taliándörögd 2017</title>
 	
@@ -24,27 +23,21 @@
 </head>
 <body>
 
-	<div class="container" ng-app="froccsFm" ng-controller="ordersCtrl" id="appContainer">
+	<div class="container" ng-app="froccsFm" ng-controller="signupCtrl">
 	
-		<h1>FröccsFM @ Tilos Udvar Taliándörögd 2017</h1>
+		<h1>FröccsFM feliratkozás</h1>
 
-		<!-- This div needs to have an id! -->
-		<div id="orders" class="row animate-repeat" ng-repeat="order in orders">
-			<div class="col-xs-2 order orderNo {{order.isVip ? 'vip' : ''}} ">
-				<p><a href="#" ng-click="fulfill(order.id)">{{order.no}}</a></p>{{order.created}}
-			</div>
-			<div class="col-xs-2 order amount">{{order.wineAmount | number:1}} dl</div>
-			<div class="col-xs-2 order amount">{{order.sodaAmount | number:1}} dl</div>
-			<div class="col-xs-3 order orderName">{{order.name}}</div>
-			<div class="col-xs-3 order customerName">{{order.customerName}}</div>
-			<div class="clearfix"></div>
-		</div>
+		<form>
+		
+			Neved:<br/>
+			<input type="text"   id="name" /><br/>
+			<input type="hidden" id="token" value="v`oTB\i:z/RQkdTV][:9O[l@G(`EkEU83;R/5]+\H_PkJWM(r)nyWR(=2g*Ft<JS0$tgb(ue9vlH.V?n92dFZxwrD7{!TRVD .&3h a+1w%.z>J[EZ(dHVa7b2<Boj7i" />
+			<button id="signupButton" ng-click="signup()" class="button">Ok</button>
+		
+		</form>
 			
 	</div>
 
-	<script>
-		initOrderUpdate();
-	</script>
 
 </body>
 </html>

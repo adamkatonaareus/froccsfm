@@ -6,7 +6,7 @@ var app = angular.module("froccsFm", ['ngAnimate']);
 var ws;
 var data;
 
-app.controller("myCtrl", function($scope, $http) 
+app.controller("ordersCtrl", function($scope, $http, $filter) 
 {
 	//--- Load data
 	$http.get("orders")
@@ -16,7 +16,18 @@ app.controller("myCtrl", function($scope, $http)
          data = $scope.orders;
     });
 	
-
+	$scope.fulfill = function(id)
+	{
+		$http.post("fulfill", id)
+		.then(function successCallback(response) 
+			{
+				$scope.orders = $filter('filter')($scope.orders, {id: "!" + id});
+				
+			}, function errorCallback(response) 
+			{
+				alert("Nem sikerült.");
+			});
+	}
 });
 
 
@@ -72,14 +83,15 @@ function sendOrderUpdate()
 
 function applyToScope(func)
 {
-	var orders = $("#orders");
-	if (!orders)
+	//FIX KA: using the app container div because if orders is empty, no orders div created.
+	var div = $("#appContainer");
+	if (!div)
 	{
-		console.log("Orders div not found!");
+		console.log("appContainer div not found!");
 		return;
 	}
 	
-	var scope = angular.element(orders).scope();
+	var scope = angular.element(div).scope();
 	
 	if (scope)
 	{
@@ -90,4 +102,5 @@ function applyToScope(func)
 		console.log("Can't find scope.");
 	}
 }
+
 
